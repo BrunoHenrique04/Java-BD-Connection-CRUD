@@ -3,7 +3,11 @@ package br.com.Construtora.DAO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import br.com.Contrutora.Models.Casa;
 
 public class CasaDAO {
 	public static Connection abrirConexao() {
@@ -53,7 +57,9 @@ public class CasaDAO {
 		setCon(con);
 	}
 	
-	public String inserirConstrutora(br.com.Contrutora.Models.Casa casa) {
+
+	
+	public String inserirConstrutora(Casa casa) {
 		String sql = "insert into casa(MetroQuadrados, QuantidadeDeQuartos, QuantidadeDeBanheiros, EnderecoCompleto, QuantidadeQuintal) values (?,?,?,?,?)";
 		try {
 			PreparedStatement ps = getCon().prepareStatement(sql);
@@ -74,5 +80,86 @@ public class CasaDAO {
 	}
 	
 	
+	public String deleteSemWhere() {
+		String sql = "DELETE FROM casa";
+		try {
+			PreparedStatement ps = getCon().prepareStatement(sql);
+			if(ps.executeUpdate() > 0) {
+			return "deleta com sucesso";
+			}
+			else
+			{
+			 return "Erro ao deletar";
+			}
+			
+			}catch (SQLException e)
+			{
+			return e.getMessage();
+			}
+	}
+	
+	public String deletarCasaComWhere(Casa casa) {
+		String sql = "delete from casa where EnderecoCompleto like (?);";
+		
+		try {
+			PreparedStatement ps = getCon().prepareStatement(sql);
+			ps.setString(1, casa.getEnderecoCompleto());
+
+		if(ps.executeUpdate() > 0) {
+			return "deleta com sucesso";
+		}
+		else	{
+			return "Erro ao deletar";
+		}
+		
+	} catch (SQLException e)	{
+		return e.getMessage();
+	   }
+	}
+	
+	public String modificarCasaComWhere(Casa casa) {
+		String sql = "update casa set QuantidadeDeQuartos = (?) where QuantidadeDeBanheiros = (?)";
+		try {
+			PreparedStatement ps = getCon().prepareStatement(sql);
+			ps.setInt(1, casa.getQuantidadeDeQuartos());
+			ps.setInt(2, casa.getQuantidadeDeBanheiros());
+			if (ps.executeUpdate() > 0) {
+				return "Alterado com sucesso";
+			} else {
+				return "Erro ao alterar";
+			}
+		} catch (SQLException e) {
+			return e.getMessage();
+		}
+	}
+	
+	public ArrayList<Casa> retornarDadosCasa(){
+		String sql = "select * from casa";
+		ArrayList<Casa> retornarCasa = new ArrayList<Casa>();
+		try {
+			PreparedStatement ps = getCon().prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			if(rs != null) {
+				while(rs.next()) {
+					Casa casa = new Casa();
+					casa.setMetroQuadrados(rs.getDouble(1));
+					casa.setQuantidadeDeQuartos(2);
+					casa.setQuantidadeDeBanheiros(3);
+					casa.setEnderecoCompleto(rs.getString(4));
+					casa.setQuantidadeQuintal(5);
+					
+					retornarCasa .add(casa);
+				}
+				return retornarCasa;
+			}else {
+				return null;
+			}
+		}catch (SQLException e) {
+			return null;
+		}
+	}
 	
 }
+	
+	
+
